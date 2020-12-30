@@ -9,12 +9,11 @@ import {
   Logger,
   LEVEL
 } from './Loggers'
-import isFunction from './Utils/function';
+import {isFunction} from './Utils';
 import {BaseServiceProvider} from './serviceProvider';
 import {Request, RequestAttributes} from './request';
-import {NotFoundError} from './Errors/notFoundError';
-import {Event} from './Events/event';
-import {EventHandler} from './Events/handler';
+import {NotFoundError} from './Errors';
+import {Event, EventHandler} from './Events';
 import {BindCallback, ServiceContainer, SingletonCallback} from './cointainer';
 
 export type LoggerConfiguration = {

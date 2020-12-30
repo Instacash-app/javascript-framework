@@ -1,6 +1,6 @@
 import { validate } from 'indicative/validator';
 import { sanitize } from 'indicative/sanitizer';
-import getObjectKey from './Utils/object';
+import {getObjectKey} from './Utils';
 
 export type RequestAttributes = {
   user?: any;

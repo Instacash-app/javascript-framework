@@ -2,7 +2,7 @@ import {
   Request,
   ValidationRules,
   SanitizationRules
-} from '../../src/request';
+} from '../../src';
 
 class RequestTest extends Request {
   protected $validationRules: ValidationRules = {

@@ -1,5 +1,5 @@
 
-export default function getObjectKey(object: any, key: string, defaultValue?: any): any {
+export const getObjectKey = (object: any, key: string, defaultValue?: any): any => {
   if (typeof object !== 'object' || object === null) {
     return defaultValue;
   }
@@ -11,4 +11,4 @@ export default function getObjectKey(object: any, key: string, defaultValue?: an
   }
 
   return keys.length === 0 ? value : getObjectKey(value, keys.join('.'), defaultValue);
-}
+};

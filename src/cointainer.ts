@@ -1,5 +1,5 @@
-import {BaseError} from './Errors/baseError';
-import isFunction from './Utils/function';
+import {BaseError} from './Errors';
+import {isFunction} from './Utils';
 
 export type SingletonCallback = () => any;
 export type BindCallback = (data: any) => any;

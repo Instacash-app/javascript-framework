@@ -1,4 +1,4 @@
-import env from '../../../src/Utils/env';
+import {env} from '../../../src/Utils';
 
 describe('env helper', () => {
   describe('Getting some variable', () => {

@@ -1,7 +1,7 @@
 import {
-  default as config,
+  config,
   Config
-} from '../../../src/Utils/config';
+} from '../../../src/Utils';
 
 describe('config helper', () => {
   beforeAll(() => {

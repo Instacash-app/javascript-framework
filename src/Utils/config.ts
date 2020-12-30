@@ -1,5 +1,5 @@
 import { existsSync } from 'fs';
-import getObjectKey from './object';
+import {getObjectKey} from './object';
 
 export class Config {
   private static $folderPath = '';
@@ -36,6 +36,6 @@ export class Config {
   }
 }
 
-export default function config(key: string, defaultValue?: any): any {
+export const config = (key: string, defaultValue?: any): any => {
   return Config.get(key, defaultValue)
-}
+};

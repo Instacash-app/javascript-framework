@@ -28,6 +28,6 @@ export class Env {
   }
 }
 
-export default function env(key: string, defaultValue?: any): any {
+export const env = (key: string, defaultValue?: any): any => {
   return Env.get(key, defaultValue);
-}
+};

@@ -1,4 +1,4 @@
-import getObjectKey from '../../../src/Utils/object';
+import {getObjectKey} from '../../../src/Utils';
 
 describe('object helper', () => {
   describe('Getting some key', () => {
