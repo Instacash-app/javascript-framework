@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Env = void 0;
+exports.env = exports.Env = void 0;
 class Env {
     static get(key, defaultValue) {
         const value = process.env[key];
@@ -28,7 +28,7 @@ class Env {
     }
 }
 exports.Env = Env;
-function env(key, defaultValue) {
+const env = (key, defaultValue) => {
     return Env.get(key, defaultValue);
-}
-exports.default = env;
+};
+exports.env = env;

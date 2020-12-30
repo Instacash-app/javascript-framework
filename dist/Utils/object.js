@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-function getObjectKey(object, key, defaultValue) {
+exports.getObjectKey = void 0;
+const getObjectKey = (object, key, defaultValue) => {
     if (typeof object !== 'object' || object === null) {
         return defaultValue;
     }
@@ -10,6 +11,6 @@ function getObjectKey(object, key, defaultValue) {
     if (value === undefined) {
         return defaultValue;
     }
-    return keys.length === 0 ? value : getObjectKey(value, keys.join('.'), defaultValue);
-}
-exports.default = getObjectKey;
+    return keys.length === 0 ? value : exports.getObjectKey(value, keys.join('.'), defaultValue);
+};
+exports.getObjectKey = getObjectKey;

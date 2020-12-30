@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ServiceContainer = void 0;
-const baseError_1 = require("./Errors/baseError");
-const function_1 = require("./Utils/function");
+const Errors_1 = require("./Errors");
+const Utils_1 = require("./Utils");
 class ServiceContainer {
     constructor() {
         this.$data = {};
@@ -19,7 +19,7 @@ class ServiceContainer {
             return info.data();
         }
         const data = info.data;
-        if (function_1.default(data)) {
+        if (Utils_1.isFunction(data)) {
             info.data = data();
         }
         return info.data;
@@ -27,7 +27,7 @@ class ServiceContainer {
     info(id) {
         const info = this.$data[id];
         if (!info) {
-            throw new baseError_1.BaseError(`${id} is not configured`);
+            throw new Errors_1.BaseError(`${id} is not configured`);
         }
         return info;
     }

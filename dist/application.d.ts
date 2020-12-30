@@ -1,7 +1,7 @@
 import { BaseService } from './service';
 import { Logger, LEVEL } from './Loggers';
 import { BaseServiceProvider } from './serviceProvider';
-import { Event } from './Events/event';
+import { Event } from './Events';
 import { BindCallback, SingletonCallback } from './cointainer';
 export declare type LoggerConfiguration = {
     type: 'fake' | 'console';

@@ -2,10 +2,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Application = void 0;
 const Loggers_1 = require("./Loggers");
-const function_1 = require("./Utils/function");
+const Utils_1 = require("./Utils");
 const request_1 = require("./request");
-const notFoundError_1 = require("./Errors/notFoundError");
-const handler_1 = require("./Events/handler");
+const Errors_1 = require("./Errors");
+const Events_1 = require("./Events");
 const cointainer_1 = require("./cointainer");
 class Application {
     constructor(configuration) {
@@ -31,7 +31,7 @@ class Application {
     async call(action, request) {
         const actionDetail = this.$actions[action];
         if (!actionDetail) {
-            throw new notFoundError_1.NotFoundError('Service not found');
+            throw new Errors_1.NotFoundError('Service not found');
         }
         const requestClass = actionDetail.request || request_1.Request;
         request = new requestClass({
@@ -49,7 +49,7 @@ class Application {
             for (const actionName in actions) {
                 const key = actionPrefix + actionName;
                 let action = actions[actionName];
-                if (function_1.default(action)) {
+                if (Utils_1.isFunction(action)) {
                     action = {
                         handler: action,
                     };
@@ -71,7 +71,7 @@ class Application {
         return this.$serviceContainer.get(id);
     }
     loadEventHandler(events) {
-        this.$eventHandler = new handler_1.EventHandler();
+        this.$eventHandler = new Events_1.EventHandler();
         for (const eventName in events) {
             const event = events[eventName];
             this.$eventHandler.register(eventName, new event(this));

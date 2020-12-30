@@ -1,1 +1,1 @@
-export default function isFunction(functionToCheck: any): boolean;
+export declare const isFunction: (functionToCheck: any) => boolean;

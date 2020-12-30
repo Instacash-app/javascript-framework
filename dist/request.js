@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Request = void 0;
 const validator_1 = require("indicative/validator");
 const sanitizer_1 = require("indicative/sanitizer");
-const object_1 = require("./Utils/object");
+const Utils_1 = require("./Utils");
 class Request {
     constructor(attributes) {
         this.$validationRules = {};
@@ -44,7 +44,7 @@ class Request {
         return this.$attributes.params;
     }
     get(key, defaultValue) {
-        return object_1.default(this.$attributes.params, key, defaultValue);
+        return Utils_1.getObjectKey(this.$attributes.params, key, defaultValue);
     }
     setParsedErrors(errors) {
         for (const error of errors) {

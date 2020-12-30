@@ -6,4 +6,4 @@ export declare class Config {
     private static loadFile;
     private static existsFile;
 }
-export default function config(key: string, defaultValue?: any): any;
+export declare const config: (key: string, defaultValue?: any) => any;

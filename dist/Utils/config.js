@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Config = void 0;
+exports.config = exports.Config = void 0;
 const fs_1 = require("fs");
 const object_1 = require("./object");
 class Config {
@@ -13,7 +13,7 @@ class Config {
         Config.loadFile(file);
         return keys.length === 0 ?
             Config.$configurations[file] :
-            object_1.default(Config.$configurations[file], keys.join('.'), defaultValue);
+            object_1.getObjectKey(Config.$configurations[file], keys.join('.'), defaultValue);
     }
     static loadFile(file) {
         if (Config.$configurations[file]) {
@@ -32,7 +32,7 @@ class Config {
 exports.Config = Config;
 Config.$folderPath = '';
 Config.$configurations = {};
-function config(key, defaultValue) {
+const config = (key, defaultValue) => {
     return Config.get(key, defaultValue);
-}
-exports.default = config;
+};
+exports.config = config;
