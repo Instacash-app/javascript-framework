@@ -20,7 +20,7 @@ class Request {
     async validate() {
         sanitizer_1.sanitize(this.$attributes.params, this.$sanitizationRules);
         try {
-            await validator_1.validate(this.$attributes.params, this.$validationRules);
+            await validator_1.validateAll(this.$attributes.params, this.$validationRules);
         }
         catch (e) {
             if (Array.isArray(e)) {

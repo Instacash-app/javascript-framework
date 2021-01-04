@@ -1,4 +1,4 @@
-import { validate } from 'indicative/validator';
+import { validateAll} from 'indicative/validator';
 import { sanitize } from 'indicative/sanitizer';
 import {getObjectKey} from './Utils';
 
@@ -32,7 +32,7 @@ export class Request {
   public async validate() {
     sanitize(this.$attributes.params, this.$sanitizationRules);
     try {
-      await validate(this.$attributes.params, this.$validationRules);
+      await validateAll(this.$attributes.params, this.$validationRules);
     } catch (e) {
       if (Array.isArray(e)) {
         this.setParsedErrors(e);
