@@ -37,6 +37,7 @@ class Application {
         request = new requestClass({
             params: request || {}
         });
+        await this.validateRequest(request);
         return await actionDetail.handler(request);
     }
     loadServices(services) {
@@ -91,6 +92,12 @@ class Application {
         }
         else {
             this.$logger = new Loggers_1.ConsoleLogger(this, logger.level || 'all');
+        }
+    }
+    async validateRequest(request) {
+        await request.validate();
+        if (request.hasErrors()) {
+            throw new Errors_1.ValidationError('Validation error', request.errors());
         }
     }
 }

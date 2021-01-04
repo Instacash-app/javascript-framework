@@ -12,7 +12,7 @@ import {
 import {isFunction} from './Utils';
 import {BaseServiceProvider} from './serviceProvider';
 import {Request, RequestAttributes} from './request';
-import {NotFoundError} from './Errors';
+import {NotFoundError, ValidationError} from './Errors';
 import {Event, EventHandler} from './Events';
 import {BindCallback, ServiceContainer, SingletonCallback} from './cointainer';
 
@@ -70,6 +70,7 @@ export class Application {
     request = new requestClass({
       params: request || {}
     });
+    await this.validateRequest(request);
 
     return await actionDetail.handler(request);
   }
@@ -133,6 +134,13 @@ export class Application {
       this.$logger = new FakeLogger(this, 'all');
     } else {
       this.$logger = new ConsoleLogger(this, logger.level || 'all');
+    }
+  }
+
+  private async validateRequest(request: Request) {
+    await request.validate();
+    if (request.hasErrors()) {
+      throw new ValidationError('Validation error', request.errors())
     }
   }
 }

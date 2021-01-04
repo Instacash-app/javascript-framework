@@ -35,5 +35,6 @@ export declare class Application {
     private loadServiceProviders;
     private loadService;
     private loadLogger;
+    private validateRequest;
 }
 export {};
