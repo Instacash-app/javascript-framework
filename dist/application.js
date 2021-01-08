@@ -7,12 +7,16 @@ const request_1 = require("./request");
 const Errors_1 = require("./Errors");
 const Events_1 = require("./Events");
 const cointainer_1 = require("./cointainer");
+const Middleware_1 = require("./Middleware");
+const pipeline_1 = require("./pipeline");
 class Application {
     constructor(configuration) {
         this.$actions = {};
         this.$serviceProviders = [];
         this.loadLogger(configuration.logger);
         this.$serviceContainer = new cointainer_1.ServiceContainer();
+        this.loadGlobalMiddleware();
+        this.loadCustomMiddleware(configuration.middleware || {});
         this.loadServices(configuration.services);
         this.loadServiceProviders(configuration.serviceProviders || []);
         this.loadEventHandler(configuration.events || {});
@@ -28,25 +32,45 @@ class Application {
     logger() {
         return this.$logger;
     }
-    async call(action, request) {
+    call(action, request, meta) {
         const actionDetail = this.$actions[action];
         if (!actionDetail) {
             throw new Errors_1.NotFoundError('Service not found');
         }
         const requestClass = actionDetail.request || request_1.Request;
         request = new requestClass({
-            params: request || {}
+            params: request || {},
+            meta: meta || {}
         });
-        await this.validateRequest(request);
-        return await actionDetail.handler(request);
+        return this.preparePipeline(actionDetail, request).run();
+    }
+    preparePipeline(actionDetail, request) {
+        const middleware = [];
+        for (const middlewareName of actionDetail.middleware) {
+            middleware.push(this.middleware(middlewareName).handle);
+        }
+        middleware.push(async (requestParam, _, next) => {
+            const response = await actionDetail.handler(requestParam);
+            return next(response);
+        });
+        return new pipeline_1.Pipeline(request, middleware);
+    }
+    middleware(middlewareName) {
+        const middleware = this.$middleware[middlewareName];
+        if (!middleware) {
+            throw new Errors_1.BaseError(`Middleware "${middlewareName} is not registered`);
+        }
+        return middleware;
     }
     loadServices(services) {
+        const globalMiddleware = ['validation'];
         for (const service of services) {
             const serviceInstance = this.loadService(service);
             const version = serviceInstance.version();
             const name = serviceInstance.name();
             const actionPrefix = `v${version}.${name}.`;
             const actions = serviceInstance.actions();
+            const serviceMiddleware = serviceInstance.middleware();
             for (const actionName in actions) {
                 const key = actionPrefix + actionName;
                 let action = actions[actionName];
@@ -55,6 +79,10 @@ class Application {
                         handler: action,
                     };
                 }
+                if (!action.middleware) {
+                    action.middleware = [];
+                }
+                action.middleware = globalMiddleware.concat(serviceMiddleware, action.middleware);
                 this.$actions[key] = action;
             }
         }
@@ -94,10 +122,14 @@ class Application {
             this.$logger = new Loggers_1.ConsoleLogger(this, logger.level || 'all');
         }
     }
-    async validateRequest(request) {
-        await request.validate();
-        if (request.hasErrors()) {
-            throw new Errors_1.ValidationError('Validation error', request.errors());
+    loadGlobalMiddleware() {
+        this.$middleware = {
+            validation: new Middleware_1.ValidationMiddleware(this)
+        };
+    }
+    loadCustomMiddleware(middleware) {
+        for (const middlewareName in middleware) {
+            this.$middleware[middlewareName] = new middleware[middlewareName](this);
         }
     }
 }

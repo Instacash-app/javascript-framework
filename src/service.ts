@@ -6,6 +6,7 @@ export type ActionHandler = (request: Request) => any;
 export type Action = {
   request?: new (attributes: RequestAttributes) => Request;
   handler: ActionHandler;
+  middleware?: string[];
 };
 
 export abstract class BaseService {
@@ -17,6 +18,9 @@ export abstract class BaseService {
   public abstract version(): number;
   public abstract actions(): Record<string, Action | ActionHandler>;
 
+  public middleware(): string[] {
+    return [];
+  }
   protected emit(event: string, data: any): Promise<void> {
     return this.$app.emit(event, data);
   }

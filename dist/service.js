@@ -5,6 +5,9 @@ class BaseService {
     constructor($app) {
         this.$app = $app;
     }
+    middleware() {
+        return [];
+    }
     emit(event, data) {
         return this.$app.emit(event, data);
     }

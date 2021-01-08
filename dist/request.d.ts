@@ -1,5 +1,8 @@
+export interface RequestUser {
+    identifier(): string | number;
+}
 export declare type RequestAttributes = {
-    user?: any;
+    user?: RequestUser;
     params?: Record<string, any>;
     meta?: Record<string, any>;
 };
@@ -14,11 +17,13 @@ export declare class Request {
     private $attributes;
     private $errors;
     constructor(attributes?: RequestAttributes);
+    withUser(user: RequestUser): this;
     validate(): Promise<void>;
     hasErrors(): boolean;
     errors(): Errors;
     withParams(params: Record<string, any>): this;
     params(): Record<string, any>;
-    get(key: string, defaultValue: any): any;
+    get(key: string, defaultValue?: any): any;
+    getMeta(key: string, defaultValue?: any): any;
     private setParsedErrors;
 }

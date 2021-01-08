@@ -16,6 +16,13 @@ class Request {
         if (!this.$attributes.params) {
             this.$attributes.params = {};
         }
+        if (!this.$attributes.meta) {
+            this.$attributes.meta = {};
+        }
+    }
+    withUser(user) {
+        this.$attributes.user = user;
+        return this;
     }
     async validate() {
         sanitizer_1.sanitize(this.$attributes.params, this.$sanitizationRules);
@@ -45,6 +52,9 @@ class Request {
     }
     get(key, defaultValue) {
         return Utils_1.getObjectKey(this.$attributes.params, key, defaultValue);
+    }
+    getMeta(key, defaultValue) {
+        return Utils_1.getObjectKey(this.$attributes.meta, key, defaultValue);
     }
     setParsedErrors(errors) {
         for (const error of errors) {

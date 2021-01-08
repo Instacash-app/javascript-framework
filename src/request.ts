@@ -2,8 +2,12 @@ import { validateAll} from 'indicative/validator';
 import { sanitize } from 'indicative/sanitizer';
 import {getObjectKey} from './Utils';
 
+export interface RequestUser {
+  identifier(): string|number
+}
+
 export type RequestAttributes = {
-  user?: any;
+  user?: RequestUser;
   params?: Record<string, any>;
   meta?: Record<string, any>;
 };
@@ -27,6 +31,15 @@ export class Request {
     if (!this.$attributes.params) {
       this.$attributes.params = {};
     }
+    if (!this.$attributes.meta) {
+      this.$attributes.meta = {};
+    }
+  }
+
+  public withUser(user: RequestUser) {
+    this.$attributes.user = user;
+
+    return this;
   }
 
   public async validate() {
@@ -60,8 +73,12 @@ export class Request {
     return this.$attributes.params;
   }
 
-  public get(key: string, defaultValue: any) {
+  public get(key: string, defaultValue?: any) {
     return getObjectKey(this.$attributes.params, key, defaultValue);
+  }
+
+  public getMeta(key: string, defaultValue?: any) {
+    return getObjectKey(this.$attributes.meta, key, defaultValue);
   }
 
   private setParsedErrors(errors: any[]) {

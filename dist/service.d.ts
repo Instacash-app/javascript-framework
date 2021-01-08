@@ -4,6 +4,7 @@ export declare type ActionHandler = (request: Request) => any;
 export declare type Action = {
     request?: new (attributes: RequestAttributes) => Request;
     handler: ActionHandler;
+    middleware?: string[];
 };
 export declare abstract class BaseService {
     protected $app: Application;
@@ -11,5 +12,6 @@ export declare abstract class BaseService {
     abstract name(): string;
     abstract version(): number;
     abstract actions(): Record<string, Action | ActionHandler>;
+    middleware(): string[];
     protected emit(event: string, data: any): Promise<void>;
 }

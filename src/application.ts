@@ -1,7 +1,6 @@
 import {
   BaseService,
   Action,
-  ActionHandler,
 } from './service';
 import {
   FakeLogger,
@@ -12,9 +11,11 @@ import {
 import {isFunction} from './Utils';
 import {BaseServiceProvider} from './serviceProvider';
 import {Request, RequestAttributes} from './request';
-import {NotFoundError, ValidationError} from './Errors';
+import {BaseError, NotFoundError} from './Errors';
 import {Event, EventHandler} from './Events';
 import {BindCallback, ServiceContainer, SingletonCallback} from './cointainer';
+import {BaseMiddleware, ValidationMiddleware} from './Middleware';
+import {MiddlewareHandler, NextCallback, Pipeline} from './pipeline';
 
 export type LoggerConfiguration = {
   type: 'fake' | 'console',
@@ -23,12 +24,14 @@ export type LoggerConfiguration = {
 export type ApplicationService = new (app: Application) => BaseService;
 export type ApplicationServiceProvider = new (app: Application) => BaseServiceProvider;
 export type ApplicationEvent = new (app: Application) => Event;
+export type ApplicationMiddleware = new (app: Application) => BaseMiddleware;
 
 type ApplicationConfiguration = {
   services: ApplicationService[];
   logger?: LoggerConfiguration;
   serviceProviders?: ApplicationServiceProvider[];
   events?: Record<string, ApplicationEvent>;
+  middleware?: Record<string, ApplicationMiddleware>;
 };
 
 export class Application {
@@ -37,11 +40,14 @@ export class Application {
   private $eventHandler: EventHandler;
   private $serviceProviders: BaseServiceProvider[] = [];
   private $serviceContainer: ServiceContainer;
+  private $middleware: Record<string, BaseMiddleware>;
   public constructor(
     configuration: ApplicationConfiguration
   ) {
     this.loadLogger(configuration.logger);
     this.$serviceContainer = new ServiceContainer();
+    this.loadGlobalMiddleware();
+    this.loadCustomMiddleware(configuration.middleware || {});
     this.loadServices(configuration.services);
     this.loadServiceProviders(configuration.serviceProviders || []);
     this.loadEventHandler(configuration.events || {});
@@ -60,7 +66,7 @@ export class Application {
     return this.$logger;
   }
 
-  public async call(action: string, request?: any): Promise<any> {
+  public call(action: string, request?: any, meta?: any): Promise<any> {
     const actionDetail: Action = this.$actions[action];
     if (!actionDetail) {
       throw new NotFoundError('Service not found');
@@ -68,29 +74,64 @@ export class Application {
 
     const requestClass:  new (attributes: RequestAttributes) => Request = actionDetail.request || Request;
     request = new requestClass({
-      params: request || {}
+      params: request || {},
+      meta: meta || {}
     });
-    await this.validateRequest(request);
 
-    return await actionDetail.handler(request);
+    return this.preparePipeline(actionDetail, request).run();
+  }
+
+  private preparePipeline(actionDetail: Action, request: Request): Pipeline {
+    const middleware: MiddlewareHandler[] = [];
+    for (const middlewareName of actionDetail.middleware) {
+      middleware.push(this.middleware(middlewareName).handle);
+    }
+    middleware.push(async (requestParam: Request, _: any, next: NextCallback): Promise<any> => {
+      const response = await actionDetail.handler(requestParam);
+
+      return next(response);
+    });
+
+    return new Pipeline(
+      request,
+      middleware
+    )
+  }
+
+  private middleware(middlewareName: string): BaseMiddleware {
+    const middleware: BaseMiddleware = this.$middleware[middlewareName];
+    if (!middleware) {
+      throw new BaseError(`Middleware "${middlewareName} is not registered`);
+    }
+
+    return middleware;
   }
 
   private loadServices(services: ApplicationService[]) {
+    const globalMiddleware = ['validation'];
     for (const service of services) {
       const serviceInstance = this.loadService(service);
       const version = serviceInstance.version();
       const name = serviceInstance.name();
       const actionPrefix = `v${version}.${name}.`;
       const actions = serviceInstance.actions();
+      const serviceMiddleware = serviceInstance.middleware();
       for (const actionName in actions) {
         const key = actionPrefix + actionName;
-        let action: Action | ActionHandler = actions[actionName];
+        let action: Action = actions[actionName]as Action;
         if (isFunction(action)) {
           action = {
-            handler: action,
-          } as Action;
+            handler: action as any,
+          };
         }
-        this.$actions[key] = action as Action;
+        if (!action.middleware) {
+          action.middleware = [];
+        }
+        action.middleware = globalMiddleware.concat(
+          serviceMiddleware,
+          action.middleware
+        );
+        this.$actions[key] = action;
       }
     }
   }
@@ -136,11 +177,15 @@ export class Application {
       this.$logger = new ConsoleLogger(this, logger.level || 'all');
     }
   }
+  private loadGlobalMiddleware() {
+    this.$middleware = {
+      validation: new ValidationMiddleware(this)
+    };
+  }
 
-  private async validateRequest(request: Request) {
-    await request.validate();
-    if (request.hasErrors()) {
-      throw new ValidationError('Validation error', request.errors())
+  private loadCustomMiddleware(middleware: Record<string, ApplicationMiddleware>) {
+    for (const middlewareName in middleware) {
+      this.$middleware[middlewareName] = new middleware[middlewareName](this);
     }
   }
 }
