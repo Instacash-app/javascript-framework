@@ -24,6 +24,12 @@ class Request {
         this.$attributes.user = user;
         return this;
     }
+    getUser() {
+        return this.$attributes.user;
+    }
+    isAuthenticated() {
+        return !!this.getUser();
+    }
     async validate() {
         sanitizer_1.sanitize(this.$attributes.params, this.$sanitizationRules);
         try {

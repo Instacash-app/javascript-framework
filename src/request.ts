@@ -36,10 +36,18 @@ export class Request {
     }
   }
 
-  public withUser(user: RequestUser) {
+  public withUser(user: RequestUser): this {
     this.$attributes.user = user;
 
     return this;
+  }
+
+  public getUser(): RequestUser|undefined {
+    return this.$attributes.user;
+  }
+
+  public isAuthenticated(): boolean {
+    return !!this.getUser();
   }
 
   public async validate() {

@@ -18,6 +18,8 @@ export declare class Request {
     private $errors;
     constructor(attributes?: RequestAttributes);
     withUser(user: RequestUser): this;
+    getUser(): RequestUser | undefined;
+    isAuthenticated(): boolean;
     validate(): Promise<void>;
     hasErrors(): boolean;
     errors(): Errors;
