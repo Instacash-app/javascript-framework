@@ -84,7 +84,8 @@ export class Application {
   private preparePipeline(actionDetail: Action, request: Request): Pipeline {
     const middleware: MiddlewareHandler[] = [];
     for (const middlewareName of actionDetail.middleware) {
-      middleware.push(this.middleware(middlewareName).handle);
+      const m = this.middleware(middlewareName);
+      middleware.push(m.handle.bind(m));
     }
     middleware.push(async (requestParam: Request, _: any, next: NextCallback): Promise<any> => {
       const response = await actionDetail.handler(requestParam);
