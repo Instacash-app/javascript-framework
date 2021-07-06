@@ -1,9 +1,6 @@
 export declare class Config {
-    private static $folderPath;
     private static $configurations;
-    static configurePath(path: string): string;
+    static load(configurations: Record<string, any>): Record<string, any>;
     static get(key: string, defaultValue?: any): any;
-    private static loadFile;
-    private static existsFile;
 }
 export declare const config: (key: string, defaultValue?: any) => any;
