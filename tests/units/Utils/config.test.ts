@@ -2,10 +2,11 @@ import {
   config,
   Config
 } from '../../../src/Utils';
+import configuration from './config/configuration';
 
 describe('config helper', () => {
   beforeAll(() => {
-    Config.configurePath(`${__dirname}/config`);
+    Config.load({configuration});
   });
   const validConfigurationFile = 'configuration';
   const invalidConfigurationFile = 'testing';
@@ -18,8 +19,8 @@ describe('config helper', () => {
       const objectResultWithDefaultValue = config(invalidConfigurationFile, defaultValue);
       expect(defaultValueResult).toEqual(defaultValue);
       expect(undefinedResult).toBeUndefined();
-      expect(objectResult).toEqual({});
-      expect(objectResultWithDefaultValue).toEqual({});
+      expect(objectResult).toBeUndefined();
+      expect(objectResultWithDefaultValue).toEqual(defaultValue);
     });
     test('It returns correct value when configuration file exists', () => {
       const defaultValue = 'DEFAULT_VALUE';
