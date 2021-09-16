@@ -1,7 +1,7 @@
 import { BaseService } from './service';
 import { Logger, LEVEL } from './Loggers';
 import { BaseServiceProvider } from './serviceProvider';
-import { Event } from './Events';
+import { Event, EventHandlerContract } from './Events';
 import { BindCallback, SingletonCallback } from './cointainer';
 import { BaseMiddleware } from './Middleware';
 export declare type LoggerConfiguration = {
@@ -9,6 +9,7 @@ export declare type LoggerConfiguration = {
     level?: LEVEL;
 };
 export declare type ApplicationService = new (app: Application) => BaseService;
+export declare type ApplicationEventHandler = new () => EventHandlerContract;
 export declare type ApplicationServiceProvider = new (app: Application) => BaseServiceProvider;
 export declare type ApplicationEvent = new (app: Application) => Event;
 export declare type ApplicationMiddleware = new (app: Application) => BaseMiddleware;
@@ -16,6 +17,7 @@ declare type ApplicationConfiguration = {
     services: ApplicationService[];
     logger?: LoggerConfiguration;
     serviceProviders?: ApplicationServiceProvider[];
+    eventHandler?: ApplicationEventHandler;
     events?: Record<string, ApplicationEvent>;
     middleware?: Record<string, ApplicationMiddleware>;
 };
@@ -34,6 +36,7 @@ export declare class Application {
     private middleware;
     private loadServices;
     emit(event: string, data: any): Promise<void>;
+    localEmit(event: string, data: any): Promise<void>;
     singleton(id: string, callback: SingletonCallback): void;
     bind(id: string, callback: BindCallback): void;
     get(id: string): any;

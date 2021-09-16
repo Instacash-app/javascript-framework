@@ -19,7 +19,7 @@ class Application {
         this.loadCustomMiddleware(configuration.middleware || {});
         this.loadServices(configuration.services);
         this.loadServiceProviders(configuration.serviceProviders || []);
-        this.loadEventHandler(configuration.events || {});
+        this.$eventHandler = configuration.eventHandler ? new configuration.eventHandler() : new Events_1.EventHandler();
         this.loadEventHandler(configuration.events || {});
     }
     async init() {
@@ -89,7 +89,10 @@ class Application {
         }
     }
     emit(event, data) {
-        return this.$eventHandler.notify(event, data);
+        return this.$eventHandler.dispatch(event, data);
+    }
+    localEmit(event, data) {
+        return this.$eventHandler.localDispatch(event, data);
     }
     singleton(id, callback) {
         this.$serviceContainer.singleton(id, callback);
@@ -101,7 +104,6 @@ class Application {
         return this.$serviceContainer.get(id);
     }
     loadEventHandler(events) {
-        this.$eventHandler = new Events_1.EventHandler();
         for (const eventName in events) {
             const event = events[eventName];
             this.$eventHandler.register(eventName, new event(this));

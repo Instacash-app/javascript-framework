@@ -12,7 +12,7 @@ import {isFunction} from './Utils';
 import {BaseServiceProvider} from './serviceProvider';
 import {Request, RequestAttributes} from './request';
 import {BaseError, NotFoundError} from './Errors';
-import {Event, EventHandler} from './Events';
+import {Event, EventHandler, EventHandlerContract} from './Events';
 import {BindCallback, ServiceContainer, SingletonCallback} from './cointainer';
 import {BaseMiddleware, ValidationMiddleware} from './Middleware';
 import {MiddlewareHandler, NextCallback, Pipeline} from './pipeline';
@@ -22,6 +22,7 @@ export type LoggerConfiguration = {
   level?: LEVEL
 };
 export type ApplicationService = new (app: Application) => BaseService;
+export type ApplicationEventHandler = new () => EventHandlerContract;
 export type ApplicationServiceProvider = new (app: Application) => BaseServiceProvider;
 export type ApplicationEvent = new (app: Application) => Event;
 export type ApplicationMiddleware = new (app: Application) => BaseMiddleware;
@@ -30,6 +31,7 @@ type ApplicationConfiguration = {
   services: ApplicationService[];
   logger?: LoggerConfiguration;
   serviceProviders?: ApplicationServiceProvider[];
+  eventHandler?: ApplicationEventHandler;
   events?: Record<string, ApplicationEvent>;
   middleware?: Record<string, ApplicationMiddleware>;
 };
@@ -37,7 +39,7 @@ type ApplicationConfiguration = {
 export class Application {
   private $actions: Record<string, Action> = {}
   private $logger: Logger;
-  private $eventHandler: EventHandler;
+  private $eventHandler: EventHandlerContract;
   private $serviceProviders: BaseServiceProvider[] = [];
   private $serviceContainer: ServiceContainer;
   private $middleware: Record<string, BaseMiddleware>;
@@ -50,7 +52,7 @@ export class Application {
     this.loadCustomMiddleware(configuration.middleware || {});
     this.loadServices(configuration.services);
     this.loadServiceProviders(configuration.serviceProviders || []);
-    this.loadEventHandler(configuration.events || {});
+    this.$eventHandler = configuration.eventHandler ? new configuration.eventHandler() : new EventHandler();
     this.loadEventHandler(configuration.events || {});
   }
 
@@ -138,7 +140,11 @@ export class Application {
   }
 
   public emit(event: string, data: any): Promise<void> {
-    return this.$eventHandler.notify(event, data);
+    return this.$eventHandler.dispatch(event, data);
+  }
+
+  public localEmit(event: string, data: any): Promise<void> {
+    return this.$eventHandler.localDispatch(event, data);
   }
 
   public singleton(id: string, callback: SingletonCallback): void {
@@ -154,7 +160,6 @@ export class Application {
   }
 
   private loadEventHandler(events: Record<string, ApplicationEvent>) {
-    this.$eventHandler = new EventHandler();
     for (const eventName in events) {
       const event = events[eventName];
       this.$eventHandler.register(eventName, new event(this));

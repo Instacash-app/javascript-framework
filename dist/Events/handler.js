@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EventHandler = void 0;
-const baseError_1 = require("../Errors/baseError");
+const Errors_1 = require("../Errors");
 class EventHandler {
     constructor() {
         this.$events = {};
@@ -9,12 +9,15 @@ class EventHandler {
     register(eventName, event) {
         this.$events[eventName] = event;
     }
-    notify(eventName, data) {
+    dispatch(eventName, data) {
+        return this.localDispatch(eventName, data);
+    }
+    localDispatch(eventName, data) {
         const event = this.$events[eventName];
         if (!event) {
-            throw new baseError_1.BaseError(`Event ('${eventName}') is not registered`);
+            throw new Errors_1.BaseError(`Event ('${eventName}') is not registered`);
         }
-        return event.notify(data);
+        return event.dispatch(data);
     }
 }
 exports.EventHandler = EventHandler;

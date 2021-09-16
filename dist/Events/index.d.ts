@@ -1,3 +1,3 @@
 export * from './event';
 export * from './handler';
-export * from './notifier';
+export * from './eventListener';

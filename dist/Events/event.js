@@ -4,15 +4,15 @@ exports.Event = void 0;
 class Event {
     constructor($app) {
         this.$app = $app;
-        this.$notifiers = [];
-        for (const notifier of this.notifiers()) {
-            this.$notifiers.push(new notifier($app));
+        this.$listeners = [];
+        for (const listener of this.listeners()) {
+            this.$listeners.push(new listener($app));
         }
     }
-    async notify(data) {
+    async dispatch(data) {
         const ps = [];
-        for (const notifier of this.$notifiers) {
-            ps.push(notifier.handle(data));
+        for (const listener of this.$listeners) {
+            ps.push(listener.handle(data));
         }
         await Promise.all(ps);
     }

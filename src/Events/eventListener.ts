@@ -1,7 +1,7 @@
 import {Application} from '../application';
 
-export abstract class Notifier {
-  constructor(
+export abstract class EventListener {
+  protected constructor(
     protected $app: Application
   ) {}
 
