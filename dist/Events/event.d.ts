@@ -4,7 +4,7 @@ export declare type EventListenerConstructor = new (app: Application) => EventLi
 export declare abstract class Event {
     private $app;
     private $listeners;
-    protected constructor($app: Application);
+    constructor($app: Application);
     dispatch(data: any): Promise<void>;
     abstract listeners(): EventListenerConstructor[];
 }

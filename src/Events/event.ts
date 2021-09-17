@@ -6,7 +6,7 @@ export type EventListenerConstructor = new (app: Application) => EventListener;
 export abstract class Event {
   private $listeners: EventListener[] = [];
 
-  protected constructor(
+  public constructor(
     private $app: Application
   ) {
     for (const listener of this.listeners()) {

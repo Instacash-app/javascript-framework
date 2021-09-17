@@ -1,7 +1,7 @@
 import {Application} from '../application';
 
 export abstract class EventListener {
-  protected constructor(
+  public constructor(
     protected $app: Application
   ) {}
 
