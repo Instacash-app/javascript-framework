@@ -10,7 +10,7 @@ export interface EventHandlerContract {
 }
 
 export class EventHandler implements EventHandlerContract {
-  private $events: EventList = {};
+  protected $events: EventList = {};
 
   public register(eventName: string, event: Event) {
     this.$events[eventName] = event;
@@ -21,11 +21,16 @@ export class EventHandler implements EventHandlerContract {
   }
 
   public localDispatch(eventName: string, data: any): Promise<void> {
+    return this.event(eventName)
+      .dispatch(data);
+  }
+
+  protected event(eventName: string) {
     const event: Event = this.$events[eventName];
     if (!event) {
       throw new BaseError(`Event ('${eventName}') is not registered`);
     }
 
-    return event.dispatch(data);
+    return event;
   }
 }

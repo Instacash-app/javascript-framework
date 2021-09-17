@@ -13,11 +13,15 @@ class EventHandler {
         return this.localDispatch(eventName, data);
     }
     localDispatch(eventName, data) {
+        return this.event(eventName)
+            .dispatch(data);
+    }
+    event(eventName) {
         const event = this.$events[eventName];
         if (!event) {
             throw new Errors_1.BaseError(`Event ('${eventName}') is not registered`);
         }
-        return event.dispatch(data);
+        return event;
     }
 }
 exports.EventHandler = EventHandler;
