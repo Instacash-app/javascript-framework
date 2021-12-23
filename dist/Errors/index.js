@@ -14,3 +14,4 @@ __exportStar(require("./baseError"), exports);
 __exportStar(require("./logicalError"), exports);
 __exportStar(require("./notFoundError"), exports);
 __exportStar(require("./validationError"), exports);
+__exportStar(require("./handler"), exports);
