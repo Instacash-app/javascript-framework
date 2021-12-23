@@ -9,6 +9,7 @@ const Events_1 = require("./Events");
 const cointainer_1 = require("./cointainer");
 const Middleware_1 = require("./Middleware");
 const pipeline_1 = require("./pipeline");
+const handler_1 = require("./Errors/handler");
 class Application {
     constructor(configuration) {
         this.$actions = {};
@@ -20,6 +21,7 @@ class Application {
         this.loadServices(configuration.services);
         this.loadServiceProviders(configuration.serviceProviders || []);
         this.$eventHandler = configuration.eventHandler ? new configuration.eventHandler() : new Events_1.EventHandler();
+        this.$errorHandler = configuration.errorHandler ? new configuration.errorHandler(this) : new handler_1.ErrorHandler(this);
         this.loadEventHandler(configuration.events || {});
     }
     async init() {
@@ -33,16 +35,18 @@ class Application {
         return this.$logger;
     }
     call(action, request, meta) {
-        const actionDetail = this.$actions[action];
-        if (!actionDetail) {
-            throw new Errors_1.NotFoundError('Service not found');
-        }
-        const requestClass = actionDetail.request || request_1.Request;
-        request = new requestClass({
-            params: request || {},
-            meta: meta || {}
+        return this.executeTrackingError(() => {
+            const actionDetail = this.$actions[action];
+            if (!actionDetail) {
+                throw new Errors_1.NotFoundError('Service not found');
+            }
+            const requestClass = actionDetail.request || request_1.Request;
+            request = new requestClass({
+                params: request || {},
+                meta: meta || {}
+            });
+            return this.preparePipeline(actionDetail, request).run();
         });
-        return this.preparePipeline(actionDetail, request).run();
     }
     preparePipeline(actionDetail, request) {
         const middleware = [];
@@ -89,10 +93,14 @@ class Application {
         }
     }
     emit(event, data) {
-        return this.$eventHandler.dispatch(event, data);
+        return this.executeTrackingError(() => {
+            return this.$eventHandler.dispatch(event, data);
+        });
     }
     localEmit(event, data) {
-        return this.$eventHandler.localDispatch(event, data);
+        return this.executeTrackingError(() => {
+            return this.$eventHandler.localDispatch(event, data);
+        });
     }
     singleton(id, callback) {
         this.$serviceContainer.singleton(id, callback);
@@ -133,6 +141,15 @@ class Application {
     loadCustomMiddleware(middleware) {
         for (const middlewareName in middleware) {
             this.$middleware[middlewareName] = new middleware[middlewareName](this);
+        }
+    }
+    async executeTrackingError(callback) {
+        try {
+            return await callback();
+        }
+        catch (e) {
+            await this.$errorHandler.handle(e);
+            throw e;
         }
     }
 }

@@ -16,6 +16,7 @@ import {Event, EventHandler, EventHandlerContract} from './Events';
 import {BindCallback, ServiceContainer, SingletonCallback} from './cointainer';
 import {BaseMiddleware, ValidationMiddleware} from './Middleware';
 import {MiddlewareHandler, NextCallback, Pipeline} from './pipeline';
+import {ErrorHandler} from "./Errors/handler";
 
 export type LoggerConfiguration = {
   type: 'fake' | 'console',
@@ -26,12 +27,14 @@ export type ApplicationEventHandler = new () => EventHandlerContract;
 export type ApplicationServiceProvider = new (app: Application) => BaseServiceProvider;
 export type ApplicationEvent = new (app: Application) => Event;
 export type ApplicationMiddleware = new (app: Application) => BaseMiddleware;
+export type ApplicationErrorHandler = new (app: Application) => ErrorHandler;
 
 type ApplicationConfiguration = {
   services: ApplicationService[];
   logger?: LoggerConfiguration;
   serviceProviders?: ApplicationServiceProvider[];
   eventHandler?: ApplicationEventHandler;
+  errorHandler?: ApplicationErrorHandler;
   events?: Record<string, ApplicationEvent>;
   middleware?: Record<string, ApplicationMiddleware>;
 };
@@ -40,6 +43,7 @@ export class Application {
   private $actions: Record<string, Action> = {}
   private $logger: Logger;
   private $eventHandler: EventHandlerContract;
+  private $errorHandler: ErrorHandler;
   private $serviceProviders: BaseServiceProvider[] = [];
   private $serviceContainer: ServiceContainer;
   private $middleware: Record<string, BaseMiddleware>;
@@ -53,6 +57,7 @@ export class Application {
     this.loadServices(configuration.services);
     this.loadServiceProviders(configuration.serviceProviders || []);
     this.$eventHandler = configuration.eventHandler ? new configuration.eventHandler() : new EventHandler();
+    this.$errorHandler = configuration.errorHandler ? new configuration.errorHandler(this) : new ErrorHandler(this);
     this.loadEventHandler(configuration.events || {});
   }
 
@@ -69,18 +74,20 @@ export class Application {
   }
 
   public call(action: string, request?: any, meta?: any): Promise<any> {
-    const actionDetail: Action = this.$actions[action];
-    if (!actionDetail) {
-      throw new NotFoundError('Service not found');
-    }
+    return this.executeTrackingError(() => {
+      const actionDetail: Action = this.$actions[action];
+      if (!actionDetail) {
+        throw new NotFoundError('Service not found');
+      }
 
-    const requestClass:  new (attributes: RequestAttributes) => Request = actionDetail.request || Request;
-    request = new requestClass({
-      params: request || {},
-      meta: meta || {}
+      const requestClass: new (attributes: RequestAttributes) => Request = actionDetail.request || Request;
+      request = new requestClass({
+        params: request || {},
+        meta: meta || {}
+      });
+
+      return this.preparePipeline(actionDetail, request).run();
     });
-
-    return this.preparePipeline(actionDetail, request).run();
   }
 
   private preparePipeline(actionDetail: Action, request: Request): Pipeline {
@@ -140,11 +147,15 @@ export class Application {
   }
 
   public emit(event: string, data: any): Promise<void> {
-    return this.$eventHandler.dispatch(event, data);
+    return this.executeTrackingError(() => {
+      return this.$eventHandler.dispatch(event, data);
+    });
   }
 
   public localEmit(event: string, data: any): Promise<void> {
-    return this.$eventHandler.localDispatch(event, data);
+    return this.executeTrackingError(() => {
+      return this.$eventHandler.localDispatch(event, data);
+    });
   }
 
   public singleton(id: string, callback: SingletonCallback): void {
@@ -192,6 +203,16 @@ export class Application {
   private loadCustomMiddleware(middleware: Record<string, ApplicationMiddleware>) {
     for (const middlewareName in middleware) {
       this.$middleware[middlewareName] = new middleware[middlewareName](this);
+    }
+  }
+
+  private async executeTrackingError(callback: () => Promise<any>): Promise<any> {
+    try {
+      return await callback();
+    } catch (e) {
+      await this.$errorHandler.handle(e);
+
+      throw e;
     }
   }
 }

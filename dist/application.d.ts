@@ -4,6 +4,7 @@ import { BaseServiceProvider } from './serviceProvider';
 import { Event, EventHandlerContract } from './Events';
 import { BindCallback, SingletonCallback } from './cointainer';
 import { BaseMiddleware } from './Middleware';
+import { ErrorHandler } from "./Errors/handler";
 export declare type LoggerConfiguration = {
     type: 'fake' | 'console';
     level?: LEVEL;
@@ -13,11 +14,13 @@ export declare type ApplicationEventHandler = new () => EventHandlerContract;
 export declare type ApplicationServiceProvider = new (app: Application) => BaseServiceProvider;
 export declare type ApplicationEvent = new (app: Application) => Event;
 export declare type ApplicationMiddleware = new (app: Application) => BaseMiddleware;
+export declare type ApplicationErrorHandler = new (app: Application) => ErrorHandler;
 declare type ApplicationConfiguration = {
     services: ApplicationService[];
     logger?: LoggerConfiguration;
     serviceProviders?: ApplicationServiceProvider[];
     eventHandler?: ApplicationEventHandler;
+    errorHandler?: ApplicationErrorHandler;
     events?: Record<string, ApplicationEvent>;
     middleware?: Record<string, ApplicationMiddleware>;
 };
@@ -25,6 +28,7 @@ export declare class Application {
     private $actions;
     private $logger;
     private $eventHandler;
+    private $errorHandler;
     private $serviceProviders;
     private $serviceContainer;
     private $middleware;
@@ -46,5 +50,6 @@ export declare class Application {
     private loadLogger;
     private loadGlobalMiddleware;
     private loadCustomMiddleware;
+    private executeTrackingError;
 }
 export {};
