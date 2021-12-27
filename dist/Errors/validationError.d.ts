@@ -7,6 +7,7 @@ export declare class ValidationError extends BaseError {
     code: number;
     errorMessages: ValidationErrorMessages;
     constructor(message: string, errorMessages: ValidationErrorMessages);
+    isReportable(): boolean;
     info(): Record<string, any>;
 }
 export {};

@@ -1,18 +1,10 @@
-import {NotFoundError} from './notFoundError';
-import {ValidationError} from './validationError';
 import {Application} from '../application';
-
-export type ErrorConstruct = new (...params: any[]) => Error;
+import {BaseError} from "./baseError";
 
 export class ErrorHandler {
   public constructor(
     protected $app: Application
   ) {}
-
-  protected $dontReport: ErrorConstruct[] = [
-    NotFoundError,
-    ValidationError,
-  ];
 
   public async handle(error: Error) {
     if (this.shouldReport(error)) {
@@ -25,10 +17,8 @@ export class ErrorHandler {
   }
 
   protected shouldReport(error: Error) {
-    for (const errorClass of this.$dontReport) {
-      if (error instanceof errorClass) {
-        return false;
-      }
+    if (error instanceof BaseError) {
+      return error.isReportable();
     }
 
     return true;

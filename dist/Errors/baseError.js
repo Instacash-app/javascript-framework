@@ -7,6 +7,9 @@ class BaseError extends Error {
         this.name = 'Unexpected';
         this.code = 500;
     }
+    isReportable() {
+        return true;
+    }
     info() {
         return {
             type: this.name,

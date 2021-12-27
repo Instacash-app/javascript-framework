@@ -6,6 +6,10 @@ export class BaseError extends Error {
     super(message);
   }
 
+  public isReportable(): boolean {
+    return true;
+  }
+
   public info(): Record<string, any> {
     return {
       type: this.name,

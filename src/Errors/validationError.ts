@@ -12,6 +12,11 @@ export class ValidationError extends BaseError {
     super(message);
     this.errorMessages = errorMessages;
   }
+
+  public isReportable(): boolean {
+    return false;
+  }
+
   public info(): Record<string, any> {
     const info = super.info();
     info.detail = this.errorMessages;

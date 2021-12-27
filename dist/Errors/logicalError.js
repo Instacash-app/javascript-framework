@@ -8,5 +8,8 @@ class LogicalError extends baseError_1.BaseError {
         this.name = 'LogicalError';
         this.code = 400;
     }
+    isReportable() {
+        return false;
+    }
 }
 exports.LogicalError = LogicalError;
