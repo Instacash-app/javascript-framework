@@ -7,7 +7,8 @@ export class ErrorHandler {
   ) {}
 
   public async handle(error: Error) {
-    if (this.shouldReport(error)) {
+    const shouldReport = await this.shouldReport(error);
+    if (shouldReport) {
       await this.report(error);
     }
   }
@@ -16,12 +17,16 @@ export class ErrorHandler {
     return Promise.resolve();
   }
 
-  protected shouldReport(error: Error) {
-    if (error instanceof BaseError) {
-      return error.isReportable();
-    }
-
-    return true;
+  protected shouldReport(error: Error): Promise<boolean> {
+    return Promise.resolve(true);
   }
 
+  protected errorKey(error: Error) {
+    let prefix = 'unexpected'
+    if (error instanceof BaseError) {
+      prefix = error.key();
+    }
+
+    return `${prefix}.${error.message}`;
+  }
 }

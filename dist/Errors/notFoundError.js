@@ -8,8 +8,8 @@ class NotFoundError extends baseError_1.BaseError {
         this.name = 'NotFoundError';
         this.code = 404;
     }
-    isReportable() {
-        return false;
+    key() {
+        return 'not-found';
     }
 }
 exports.NotFoundError = NotFoundError;

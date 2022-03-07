@@ -7,7 +7,8 @@ class ErrorHandler {
         this.$app = $app;
     }
     async handle(error) {
-        if (this.shouldReport(error)) {
+        const shouldReport = await this.shouldReport(error);
+        if (shouldReport) {
             await this.report(error);
         }
     }
@@ -15,10 +16,14 @@ class ErrorHandler {
         return Promise.resolve();
     }
     shouldReport(error) {
+        return Promise.resolve(true);
+    }
+    errorKey(error) {
+        let prefix = 'unexpected';
         if (error instanceof baseError_1.BaseError) {
-            return error.isReportable();
+            prefix = error.key();
         }
-        return true;
+        return `${prefix}.${error.message}`;
     }
 }
 exports.ErrorHandler = ErrorHandler;

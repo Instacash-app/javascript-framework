@@ -7,8 +7,8 @@ class BaseError extends Error {
         this.name = 'Unexpected';
         this.code = 500;
     }
-    isReportable() {
-        return true;
+    key() {
+        return 'unexpected';
     }
     info() {
         return {

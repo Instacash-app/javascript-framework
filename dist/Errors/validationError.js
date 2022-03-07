@@ -10,8 +10,8 @@ class ValidationError extends baseError_1.BaseError {
         this.errorMessages = {};
         this.errorMessages = errorMessages;
     }
-    isReportable() {
-        return false;
+    key() {
+        return 'validation';
     }
     info() {
         const info = super.info();

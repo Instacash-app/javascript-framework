@@ -6,7 +6,8 @@ export class NotFoundError extends BaseError {
   constructor(message: string) {
     super(message);
   }
-  public isReportable(): boolean {
-    return false;
+
+  public key(): string {
+    return 'not-found';
   }
 }

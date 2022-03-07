@@ -4,5 +4,6 @@ export declare class ErrorHandler {
     constructor($app: Application);
     handle(error: Error): Promise<void>;
     protected report(error: Error): Promise<void>;
-    protected shouldReport(error: Error): boolean;
+    protected shouldReport(error: Error): Promise<boolean>;
+    protected errorKey(error: Error): string;
 }

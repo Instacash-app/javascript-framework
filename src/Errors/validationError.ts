@@ -13,8 +13,8 @@ export class ValidationError extends BaseError {
     this.errorMessages = errorMessages;
   }
 
-  public isReportable(): boolean {
-    return false;
+  public key(): string {
+    return 'validation';
   }
 
   public info(): Record<string, any> {

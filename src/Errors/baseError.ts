@@ -6,8 +6,8 @@ export class BaseError extends Error {
     super(message);
   }
 
-  public isReportable(): boolean {
-    return true;
+  public key(): string {
+    return 'unexpected';
   }
 
   public info(): Record<string, any> {
