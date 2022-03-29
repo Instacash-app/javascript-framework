@@ -90,6 +90,10 @@ export class Application {
     });
   }
 
+  public errorHandler(): ErrorHandler {
+    return this.$errorHandler;
+  }
+
   private preparePipeline(actionDetail: Action, request: Request): Pipeline {
     const middleware: MiddlewareHandler[] = [];
     for (const middlewareName of actionDetail.middleware) {

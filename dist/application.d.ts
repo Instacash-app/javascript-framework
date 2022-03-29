@@ -36,6 +36,7 @@ export declare class Application {
     init(): Promise<void>;
     logger(): Logger;
     call(action: string, request?: any, meta?: any): Promise<any>;
+    errorHandler(): ErrorHandler;
     private preparePipeline;
     private middleware;
     private loadServices;

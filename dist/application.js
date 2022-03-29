@@ -48,6 +48,9 @@ class Application {
             return this.preparePipeline(actionDetail, request).run();
         });
     }
+    errorHandler() {
+        return this.$errorHandler;
+    }
     preparePipeline(actionDetail, request) {
         const middleware = [];
         for (const middlewareName of actionDetail.middleware) {
