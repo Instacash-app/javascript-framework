@@ -14,7 +14,7 @@ export abstract class Event {
     }
   }
 
-  public async dispatch(data: any): Promise<void> {
+  public async execute(data: any): Promise<void> {
     const ps: Promise<void>[] = [];
     for (const listener of this.$listeners) {
       ps.push(listener.handle(data));

@@ -9,12 +9,15 @@ class EventHandler {
     register(eventName, event) {
         this.$events[eventName] = event;
     }
-    dispatch(eventName, data) {
-        return this.localDispatch(eventName, data);
+    emit(eventName, data) {
+        return this.execute(eventName, data);
     }
-    localDispatch(eventName, data) {
+    queue(eventName, data) {
+        return this.execute(eventName, data);
+    }
+    execute(eventName, data) {
         return this.event(eventName)
-            .dispatch(data);
+            .execute(data);
     }
     event(eventName) {
         const event = this.$events[eventName];

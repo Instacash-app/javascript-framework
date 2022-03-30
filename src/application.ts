@@ -152,13 +152,19 @@ export class Application {
 
   public emit(event: string, data: any): Promise<void> {
     return this.executeTrackingError(() => {
-      return this.$eventHandler.dispatch(event, data);
+      return this.$eventHandler.emit(event, data);
     });
   }
 
-  public localEmit(event: string, data: any): Promise<void> {
+  public queue(event: string, data: any): Promise<void> {
     return this.executeTrackingError(() => {
-      return this.$eventHandler.localDispatch(event, data);
+      return this.$eventHandler.queue(event, data);
+    });
+  }
+
+  public executeEvent(event: string, data: any): Promise<void> {
+    return this.executeTrackingError(() => {
+      return this.$eventHandler.execute(event, data);
     });
   }
 

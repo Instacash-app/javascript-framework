@@ -9,7 +9,7 @@ class Event {
             this.$listeners.push(new listener($app));
         }
     }
-    async dispatch(data) {
+    async execute(data) {
         const ps = [];
         for (const listener of this.$listeners) {
             ps.push(listener.handle(data));

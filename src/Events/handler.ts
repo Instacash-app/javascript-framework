@@ -5,8 +5,9 @@ type EventList = Record<string, Event>;
 
 export interface EventHandlerContract {
   register(eventName: string, event: Event): void,
-  dispatch(eventName: string, data: any): Promise<void>,
-  localDispatch(eventName: string, data: any): Promise<void>,
+  queue(eventName: string, data: any): Promise<void>,
+  emit(eventName: string, data: any): Promise<void>,
+  execute(eventName: string, data: any): Promise<void>,
 }
 
 export class EventHandler implements EventHandlerContract {
@@ -16,13 +17,17 @@ export class EventHandler implements EventHandlerContract {
     this.$events[eventName] = event;
   }
 
-  public dispatch(eventName: string, data: any): Promise<void> {
-    return this.localDispatch(eventName, data);
+  public emit(eventName: string, data: any): Promise<void> {
+    return this.execute(eventName, data);
   }
 
-  public localDispatch(eventName: string, data: any): Promise<void> {
+  public queue(eventName: string, data: any): Promise<void> {
+    return this.execute(eventName, data);
+  }
+
+  public execute(eventName: string, data: any): Promise<void> {
     return this.event(eventName)
-      .dispatch(data);
+      .execute(data);
   }
 
   protected event(eventName: string) {

@@ -5,6 +5,6 @@ export declare abstract class Event {
     private $app;
     private $listeners;
     constructor($app: Application);
-    dispatch(data: any): Promise<void>;
+    execute(data: any): Promise<void>;
     abstract listeners(): EventListenerConstructor[];
 }

@@ -97,12 +97,17 @@ class Application {
     }
     emit(event, data) {
         return this.executeTrackingError(() => {
-            return this.$eventHandler.dispatch(event, data);
+            return this.$eventHandler.emit(event, data);
         });
     }
-    localEmit(event, data) {
+    queue(event, data) {
         return this.executeTrackingError(() => {
-            return this.$eventHandler.localDispatch(event, data);
+            return this.$eventHandler.queue(event, data);
+        });
+    }
+    executeEvent(event, data) {
+        return this.executeTrackingError(() => {
+            return this.$eventHandler.execute(event, data);
         });
     }
     singleton(id, callback) {

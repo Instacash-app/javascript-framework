@@ -41,7 +41,8 @@ export declare class Application {
     private middleware;
     private loadServices;
     emit(event: string, data: any): Promise<void>;
-    localEmit(event: string, data: any): Promise<void>;
+    queue(event: string, data: any): Promise<void>;
+    executeEvent(event: string, data: any): Promise<void>;
     singleton(id: string, callback: SingletonCallback): void;
     bind(id: string, callback: BindCallback): void;
     get(id: string): any;
