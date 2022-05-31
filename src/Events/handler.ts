@@ -1,16 +1,11 @@
 import { Event } from './event';
 import { BaseError } from '../Errors';
-import { type } from 'os';
 
 type EventList = Record<string, Event>;
 
 export type EventOptions = {
-  SQSOptions?: SQSOptions
+  delaySeconds?: number
 }
-export type SQSOptions = {
-  DelaySeconds?: number
-}
-
 export interface EventHandlerContract {
   register(eventName: string, event: Event): void,
   queue(eventName: string, data: any, eventOptions?: EventOptions): Promise<void>,
