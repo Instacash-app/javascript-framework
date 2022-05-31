@@ -1,10 +1,7 @@
 import { Event } from './event';
 declare type EventList = Record<string, Event>;
 export declare type EventOptions = {
-    SQSOptions?: SQSOptions;
-};
-export declare type SQSOptions = {
-    DelaySeconds?: number;
+    delaySeconds?: number;
 };
 export interface EventHandlerContract {
     register(eventName: string, event: Event): void;
