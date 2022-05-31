@@ -12,7 +12,7 @@ class EventHandler {
     emit(eventName, data) {
         return this.execute(eventName, data);
     }
-    queue(eventName, data) {
+    queue(eventName, data, eventOptions) {
         return this.execute(eventName, data);
     }
     execute(eventName, data) {

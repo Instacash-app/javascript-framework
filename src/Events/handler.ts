@@ -1,14 +1,23 @@
-import {Event} from './event';
-import {BaseError} from '../Errors';
+import { Event } from './event';
+import { BaseError } from '../Errors';
+import { type } from 'os';
 
 type EventList = Record<string, Event>;
 
+export type EventOptions = {
+  SQSOptions?: SQSOptions
+}
+export type SQSOptions = {
+  DelaySeconds?: number
+}
+
 export interface EventHandlerContract {
   register(eventName: string, event: Event): void,
-  queue(eventName: string, data: any): Promise<void>,
+  queue(eventName: string, data: any, eventOptions?: EventOptions): Promise<void>,
   emit(eventName: string, data: any): Promise<void>,
   execute(eventName: string, data: any): Promise<void>,
 }
+
 
 export class EventHandler implements EventHandlerContract {
   protected $events: EventList = {};
@@ -21,7 +30,7 @@ export class EventHandler implements EventHandlerContract {
     return this.execute(eventName, data);
   }
 
-  public queue(eventName: string, data: any): Promise<void> {
+  public queue(eventName: string, data: any, eventOptions?: EventOptions): Promise<void> {
     return this.execute(eventName, data);
   }
 
