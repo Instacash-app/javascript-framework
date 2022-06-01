@@ -100,9 +100,9 @@ class Application {
             return this.$eventHandler.emit(event, data);
         });
     }
-    queue(event, data) {
+    queue(event, data, eventOptions) {
         return this.executeTrackingError(() => {
-            return this.$eventHandler.queue(event, data);
+            return this.$eventHandler.queue(event, data, eventOptions);
         });
     }
     executeEvent(event, data) {

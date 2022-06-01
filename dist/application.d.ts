@@ -1,7 +1,7 @@
 import { BaseService } from './service';
 import { Logger, LEVEL } from './Loggers';
 import { BaseServiceProvider } from './serviceProvider';
-import { Event, EventHandlerContract } from './Events';
+import { Event, EventHandlerContract, EventOptions } from './Events';
 import { BindCallback, SingletonCallback } from './cointainer';
 import { BaseMiddleware } from './Middleware';
 import { ErrorHandler } from "./Errors/handler";
@@ -41,7 +41,7 @@ export declare class Application {
     private middleware;
     private loadServices;
     emit(event: string, data: any): Promise<void>;
-    queue(event: string, data: any): Promise<void>;
+    queue(event: string, data: any, eventOptions?: EventOptions): Promise<void>;
     executeEvent(event: string, data: any): Promise<void>;
     singleton(id: string, callback: SingletonCallback): void;
     bind(id: string, callback: BindCallback): void;

@@ -8,15 +8,15 @@ import {
   Logger,
   LEVEL
 } from './Loggers'
-import {isFunction} from './Utils';
-import {BaseServiceProvider} from './serviceProvider';
-import {Request, RequestAttributes} from './request';
-import {BaseError, NotFoundError} from './Errors';
-import {Event, EventHandler, EventHandlerContract} from './Events';
-import {BindCallback, ServiceContainer, SingletonCallback} from './cointainer';
-import {BaseMiddleware, ValidationMiddleware} from './Middleware';
-import {MiddlewareHandler, NextCallback, Pipeline} from './pipeline';
-import {ErrorHandler} from "./Errors/handler";
+import { isFunction } from './Utils';
+import { BaseServiceProvider } from './serviceProvider';
+import { Request, RequestAttributes } from './request';
+import { BaseError, NotFoundError } from './Errors';
+import { Event, EventHandler, EventHandlerContract, EventOptions } from './Events';
+import { BindCallback, ServiceContainer, SingletonCallback } from './cointainer';
+import { BaseMiddleware, ValidationMiddleware } from './Middleware';
+import { MiddlewareHandler, NextCallback, Pipeline } from './pipeline';
+import { ErrorHandler } from "./Errors/handler";
 
 export type LoggerConfiguration = {
   type: 'fake' | 'console',
@@ -132,7 +132,7 @@ export class Application {
       const serviceMiddleware = serviceInstance.middleware();
       for (const actionName in actions) {
         const key = actionPrefix + actionName;
-        let action: Action = actions[actionName]as Action;
+        let action: Action = actions[actionName] as Action;
         if (isFunction(action)) {
           action = {
             handler: action as any,
@@ -156,9 +156,9 @@ export class Application {
     });
   }
 
-  public queue(event: string, data: any): Promise<void> {
+  public queue(event: string, data: any, eventOptions?: EventOptions): Promise<void> {
     return this.executeTrackingError(() => {
-      return this.$eventHandler.queue(event, data);
+      return this.$eventHandler.queue(event, data, eventOptions);
     });
   }
 
