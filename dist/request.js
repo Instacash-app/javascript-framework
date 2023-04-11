@@ -49,6 +49,10 @@ class Request {
     errors() {
         return this.$errors;
     }
+    withErrors(errors) {
+        this.$errors = errors;
+        return this;
+    }
     withParams(params) {
         this.$attributes.params = params;
         return this;
@@ -60,6 +64,9 @@ class Request {
         return Utils_1.getObjectKey(this.$attributes.params, key, defaultValue);
     }
     getMeta(key, defaultValue) {
+        if (!key) {
+            return this.$attributes.meta;
+        }
         return Utils_1.getObjectKey(this.$attributes.meta, key, defaultValue);
     }
     setParsedErrors(errors) {

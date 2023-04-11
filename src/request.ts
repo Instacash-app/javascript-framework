@@ -1,6 +1,6 @@
 import { validateAll} from 'indicative/validator';
 import { sanitize } from 'indicative/sanitizer';
-import {getObjectKey} from './Utils';
+import { getObjectKey } from './Utils';
 
 export interface RequestUser {
   identifier(): string|number
@@ -20,8 +20,8 @@ export type Errors = {
 export class Request {
   protected $validationRules: ValidationRules = {};
   protected $sanitizationRules: SanitizationRules = {};
-  private $attributes: RequestAttributes;
-  private $errors: Errors = {};
+  protected $attributes: RequestAttributes;
+  protected $errors: Errors = {};
 
   constructor(attributes?: RequestAttributes) {
     if (!attributes) {
@@ -71,6 +71,12 @@ export class Request {
     return this.$errors;
   }
 
+  public withErrors(errors: Errors) {
+    this.$errors = errors;
+
+    return this;
+  }
+
   public withParams(params: Record<string, any>): this {
     this.$attributes.params = params;
 
@@ -85,7 +91,11 @@ export class Request {
     return getObjectKey(this.$attributes.params, key, defaultValue);
   }
 
-  public getMeta(key: string, defaultValue?: any) {
+  public getMeta(key?: string, defaultValue?: any) {
+    if (!key) {
+      return this.$attributes.meta;
+    }
+
     return getObjectKey(this.$attributes.meta, key, defaultValue);
   }
 

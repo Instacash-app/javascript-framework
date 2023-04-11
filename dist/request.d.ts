@@ -14,8 +14,8 @@ export declare type Errors = {
 export declare class Request {
     protected $validationRules: ValidationRules;
     protected $sanitizationRules: SanitizationRules;
-    private $attributes;
-    private $errors;
+    protected $attributes: RequestAttributes;
+    protected $errors: Errors;
     constructor(attributes?: RequestAttributes);
     withUser(user: RequestUser): this;
     getUser(): RequestUser | undefined;
@@ -23,9 +23,10 @@ export declare class Request {
     validate(): Promise<void>;
     hasErrors(): boolean;
     errors(): Errors;
+    withErrors(errors: Errors): this;
     withParams(params: Record<string, any>): this;
     params(): Record<string, any>;
     get(key: string, defaultValue?: any): any;
-    getMeta(key: string, defaultValue?: any): any;
+    getMeta(key?: string, defaultValue?: any): any;
     private setParsedErrors;
 }
